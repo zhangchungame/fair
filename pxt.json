@@ -1,16 +1,16 @@
 {
-    "name": "robotbit",
+    "name": "fair",
     "version": "0.2.5",
-    "description": "Extension for Kittenbot Robotbit",
+    "description": "仙童学院学习用积木包",
     "license": "MIT",
     "dependencies": {
-        "core": "*",
-        "neopixel": "github:microsoft/pxt-neopixel#v0.6.9"
+        "core": "*"
+//        "neopixel": "github:microsoft/pxt-neopixel#v0.6.9"
     },
     "files": [
         "README.md",
         "main.ts",
-        "_locales/zh/robotbit-strings.json"
+        "_locales/zh/fair.json"
     ],
     "testFiles": [
         "test.ts"
