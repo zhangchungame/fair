@@ -1,18 +1,12 @@
 {
-    "name": "robotbit",
-    "version": "0.2.5",
-    "description": "Extension for Kittenbot Robotbit",
-    "license": "MIT",
+    "name": "fair",
     "dependencies": {
-        "core": "*"
+        "core": "*",
+        "radio": "*"
     },
+    "description": "first fair test extension",
     "files": [
-        "README.md",
         "main.ts",
-        "_locales/zh/fair-strings.json"
-    ],
-    "testFiles": [
-        "test.ts"
-    ],
-    "public": true
+        "README.md"
+    ]
 }
