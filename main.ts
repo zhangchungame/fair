@@ -1,96 +1,550 @@
-/*
-Riven
-modified from pxt-servo/servodriver.ts
+﻿/*
+Copyright (C): 2010-2019, Shenzhen Yahboom Tech
+modified from liusen
 load dependency
-"robotbit": "file:../pxt-robotbit"
+"mbit": "file:../pxt-mbit"
 */
 
 
-//% color="#31C7D5" weight=10 icon="\uf1d0"
-namespace robotbit {
-    const PCA9685_ADDRESS = 0x40
+
+//% color="#C814B8" weight=25 icon="\uf1d4"
+namespace mbit_显示类 {
+    
+    export enum enColor {
+
+        //% blockId="OFF" block="灭"
+        OFF = 0,
+        //% blockId="Red" block="红色"
+        Red,
+        //% blockId="Green" block="绿色"
+        Green,
+        //% blockId="Blue" block="蓝色"
+        Blue,
+        //% blockId="White" block="白色"
+        White,
+        //% blockId="Cyan" block="青色"
+        Cyan,
+        //% blockId="Pinkish" block="品红"
+        Pinkish,
+        //% blockId="Yellow" block="黄色"
+        Yellow,
+
+    }
+    export enum enLED1 {
+        
+        //% blockId="OFF" block="灭"
+        OFF = 0,
+        //% blockId="ON" block="亮"
+        ON =1
+    }
+
+    //% blockId=mbit_LED1 block="LED1|pin %pin|value %value"
+    //% weight=5
+    //% blockGap=8
+    //% color="#C814B8"
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=1
+    export function LED1(pin: DigitalPin, value: enLED1): void {
+
+        pins.digitalWritePin(pin, value);
+
+    }
+
+    //% blockId=mbit_LED2 block="LED2|pin %pin|value %value"
+    //% weight=4
+    //% blockGap=8
+    //% color="#C814B8"
+    //% value.min=0 value.max=255
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=2
+    export function LED2(pin: AnalogPin, value: number): void {
+
+        pins.analogWritePin(pin, value * 1024 / 256);
+
+    }
+
+    //% blockId=mbit_BreathLED block="BreathLED|pin %pin"
+    //% weight=3
+    //% blockGap=8
+    //% color="#C814B8"
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=3
+    export function BreathLED(pin: AnalogPin): void {
+
+        for (let i: number = 0; i < 1023; i++) {
+            pins.analogWritePin(pin, i);
+            //basic.pause(1);
+            control.waitMicros(1000);
+        }
+        basic.pause(10);
+        for (let i: number = 1023; i > 0; i--) {
+            pins.analogWritePin(pin, i);
+            //basic.pause(1);
+            control.waitMicros(1000);
+        }
+
+    }
+
+    //% blockId=mbit_RGB block="RGB|pin1 %pin1|pin2 %pin2|pin3 %pin3|value1 %value1|value2 %value2|value3 %value3"
+    //% weight=2
+    //% blockGap=8
+    //% color="#C814B8"
+    //% value1.min=0 value1.max=255 value2.min=0 value2.max=255 value3.min=0 value3.max=255
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    export function RGB(pin1: AnalogPin, pin2: AnalogPin, pin3: AnalogPin, value1: number, value2: number, value3: number): void {
+
+        pins.analogWritePin(pin1, value1 * 1024 / 256);
+        pins.analogWritePin(pin2, value2 * 1024 / 256);
+        pins.analogWritePin(pin3, value3 * 1024 / 256);
+
+    }
+    //% blockId=mbit_RGB2 block="RGB|pin1 %pin1|pin2 %pin2|pin3 %pin3|value %value"
+    //% weight=1
+    //% blockGap=8
+    //% color="#C814B8"
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    export function RGB2(pin1: DigitalPin, pin2: DigitalPin, pin3: DigitalPin, value: enColor): void {
+
+        switch (value) {
+            case enColor.OFF: {
+                pins.digitalWritePin(pin1, 0);
+                pins.digitalWritePin(pin2, 0);
+                pins.digitalWritePin(pin3, 0);
+                break;
+            }
+            case enColor.Red: {
+                pins.digitalWritePin(pin1, 1);
+                pins.digitalWritePin(pin2, 0);
+                pins.digitalWritePin(pin3, 0);
+                break;
+            }
+            case enColor.Green: {
+                pins.digitalWritePin(pin1, 0);
+                pins.digitalWritePin(pin2, 1);
+                pins.digitalWritePin(pin3, 0);
+                break;
+            }
+            case enColor.Blue: {
+                pins.digitalWritePin(pin1, 0);
+                pins.digitalWritePin(pin2, 0);
+                pins.digitalWritePin(pin3, 1);
+                break;
+            }
+            case enColor.White: {
+                pins.digitalWritePin(pin1, 1);
+                pins.digitalWritePin(pin2, 1);
+                pins.digitalWritePin(pin3, 1);
+                break;
+            }
+            case enColor.Cyan: {
+                pins.digitalWritePin(pin1, 0);
+                pins.digitalWritePin(pin2, 1);
+                pins.digitalWritePin(pin3, 1);
+                break;
+            }
+            case enColor.Pinkish: {
+                pins.digitalWritePin(pin1, 1);
+                pins.digitalWritePin(pin2, 0);
+                pins.digitalWritePin(pin3, 1);
+                break;
+            }
+            case enColor.Yellow: {
+                pins.digitalWritePin(pin1, 1);
+                pins.digitalWritePin(pin2, 1);
+                pins.digitalWritePin(pin3, 0);
+                break;
+            }
+        }
+
+    }
+   
+}
+/*****************************************************************************************************************************************
+ *  传感器类 ***************************************************************************************************************************** 
+ ****************************************************************************************************************************************/
+
+//% color="#87CEEB" weight=24 icon="\uf1b6"
+namespace mbit_传感器类 {
+
+    export enum enVoice {
+        //% blockId="Voice" block="有声音"
+        Voice = 0,
+        //% blockId="NoVoice" block="无声音"
+        NoVoice = 1
+    }
+
+    export enum enIR {
+        //% blockId="Get" block="检测到"
+        Get = 0,
+        //% blockId="NoVoice" block="未检测"
+        NoGet = 1
+    }
+    
+
+    //% blockId=mbit_Voice_Sensor block="Voice_Sensor|pin %pin|value %value"
+    //% weight=100
+    //% blockGap=10
+    //% color="#87CEEB"
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    export function Voice_Sensor(pin: DigitalPin, value: enVoice): boolean {
+
+        pins.setPull(pin, PinPullMode.PullUp);
+        if (pins.digitalReadPin(pin) == value) {
+            return true;
+        }
+        else {
+            return false;
+        }
+
+    }
+
+    function IR_send_38k() {
+        for (let i: number = 0; i < 8; i++) {
+            pins.digitalWritePin(DigitalPin.P9, 1);
+            control.waitMicros(13);
+            pins.digitalWritePin(DigitalPin.P9, 0);
+            control.waitMicros(13);
+        }
+    }
+    //% blockId=mbit_IR_Sensor block="IR_Sensor|pin %pin| |%value|障碍物"
+    //% weight=100
+    //% blockGap=10
+    //% color="#87CEEB"
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    export function IR_Sensor(pin: DigitalPin, value: enIR): boolean {
+
+        pins.setPull(pin, PinPullMode.PullUp);
+        //IR_send_38k();
+        if (pins.digitalReadPin(pin) == value) {
+            return true;
+        }
+        else {
+            return false;
+        }
+
+    }
+
+    //% blockId=mbit_IR_Send block="IR_Send|pin %pin"
+    //% weight=100
+    //% blockGap=10
+    //% color="#87CEEB"
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    export function IR_Send(pin: DigitalPin): void {
+
+        
+        IR_send_38k();
+
+    }
+   
+    //% blockId=mbit_ultrasonic block="Ultrasonic|Trig %Trig|Echo %Echo"
+    //% color="#87CEEB"
+    //% weight=100
+    //% blockGap=10
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    export function Ultrasonic(Trig: DigitalPin, Echo: DigitalPin): number {
+
+        // send pulse
+        pins.setPull(Trig, PinPullMode.PullNone);
+        pins.digitalWritePin(Trig, 0);
+        control.waitMicros(2);
+        pins.digitalWritePin(Trig, 1);
+        control.waitMicros(15);
+        pins.digitalWritePin(Trig, 0);
+
+        // read pulse
+        let d = pins.pulseIn(Echo, PulseValue.High, 23200);
+        return d / 58;
+    }
+}
+
+/*****************************************************************************************************************************************
+ *  输入类 *****************************************************************************************************************************
+ ****************************************************************************************************************************************/
+
+//% color="#808080" weight=23 icon="\uf11c"
+namespace mbit_输入类 {
+
+    export enum enRocker {
+        //% blockId="Nostate" block="无"
+        Nostate = 0,
+        //% blockId="Up" block="上"
+        Up,
+        //% blockId="Down" block="下"
+        Down,
+        //% blockId="Left" block="左"
+        Left,
+        //% blockId="Right" block="右"
+        Right,
+        //% blockId="Press" block="按下"
+        Press
+    }
+
+    export enum enTouch {
+        //% blockId="NoTouch" block="未触摸"
+        NoTouch = 0,
+        //% blockId="Touch" block="触摸"
+        Touch = 1
+    }
+    export enum enButton {
+        //% blockId="Press" block="按下"
+        Press = 0,
+        //% blockId="Realse" block="松开"
+        Realse = 1
+    }
+
+    //% blockId=mbit_TouchPad block="TouchPad|pin %pin|value %value"
+    //% weight=100
+    //% blockGap=10
+    //% color="#808080"
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=5
+    export function TouchPad(pin: DigitalPin, value: enTouch): boolean {
+
+        pins.setPull(pin, PinPullMode.PullUp);
+        if (pins.digitalReadPin(pin) == value) {
+            return true;
+        }
+        else {
+            return false;
+        }
+
+    }
+    //% blockId=mbit_Rocker block="Rocker|VRX %pin1|VRY %pin2|SW %pin3|value %value"
+    //% weight=100
+    //% blockGap=10
+    //% color="#808080"
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=6
+    export function Rocker(pin1: AnalogPin, pin2: AnalogPin, pin3: DigitalPin, value: enRocker): boolean {
+
+        pins.setPull(pin3, PinPullMode.PullUp);
+        let x = pins.analogReadPin(pin1);
+        let y = pins.analogReadPin(pin2);
+        let z = pins.digitalReadPin(pin3);
+        let now_state = enRocker.Nostate;
+
+        if (x < 100) // 上
+        {
+
+            now_state = enRocker.Up;
+
+        }
+        else if (x > 700) //
+        {
+
+            now_state = enRocker.Down;
+        }
+        else  // 左右
+        {
+            if (y < 100) //右
+            {
+                now_state = enRocker.Right;
+            }
+            else if (y > 700) //左
+            {
+                now_state = enRocker.Left;
+            }
+        }
+        if (z == 0)
+            now_state = enRocker.Press;
+        if (now_state == value)
+            return true;
+        else
+            return false;
+
+    }
+
+    //% blockId=mbit_Button block="Button|pin %pin|value %value"
+    //% weight=100
+    //% blockGap=10
+    //% color="#808080"
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=5
+    export function Button(pin: DigitalPin, value: enButton): boolean {
+
+        pins.setPull(pin, PinPullMode.PullUp);
+        if (pins.digitalReadPin(pin) == value) {
+            return true;
+        }
+        else {
+            return false;
+        }
+
+    }  
+}
+
+/*****************************************************************************************************************************************
+ *    音乐类 *****************************************************************************************************************************
+ ****************************************************************************************************************************************/
+
+//% color="#D2691E" weight=22 icon="\uf001"
+namespace mbit_音乐类 {
+    export enum enBuzzer {
+
+        //% blockId="NoBeep" block="不响"
+        NoBeep = 0,
+        //% blockId="Beep" block="响"
+        Beep
+    }
+
+    //% blockId=mbit_Buzzer block="Buzzer|pin %pin|value %value"
+    //% weight=100
+    //% blockGap=10 
+    //% color="#D2691E"
+    //% value.min=0 value.max=1
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=8
+    export function Buzzer(pin: DigitalPin, value: enBuzzer): void {
+
+        pins.setPull(pin, PinPullMode.PullNone);
+        pins.digitalWritePin(pin, value);
+
+    }
+
+}
+
+/*****************************************************************************************************************************************
+ *    电机类 *****************************************************************************************************************************
+ ****************************************************************************************************************************************/
+
+//% color="#0000CD" weight=21 icon="\uf185"
+namespace mbit_电机类 {
+
+    //% blockId=mbit_Fan block="Fan|pin %pin|speed %value"
+    //% weight=100
+    //% blockGap=10
+    //% color="#0000CD"
+    //% value.min=0 value.max=1023
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=9
+    export function Fan(pin: AnalogPin, value: number): void {
+
+        pins.analogWritePin(pin, value);
+
+    }
+
+    //% blockId=mbit_Servo block="Servo|pin %pin|value %value"
+    //% weight=100
+    //% blockGap=10
+    //% color="#0000CD"
+    //% value.min=0 value.max=180
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=9
+    export function Servo(pin: AnalogPin, value: number): void {
+
+        pins.servoWritePin(pin, value);
+
+    }
+
+}
+
+//% color="#006400" weight=20 icon="\uf1b9"
+namespace mbit_小车类 {
+
+    const PCA9685_ADD = 0x41
     const MODE1 = 0x00
     const MODE2 = 0x01
     const SUBADR1 = 0x02
     const SUBADR2 = 0x03
     const SUBADR3 = 0x04
-    const PRESCALE = 0xFE
+
     const LED0_ON_L = 0x06
     const LED0_ON_H = 0x07
     const LED0_OFF_L = 0x08
     const LED0_OFF_H = 0x09
+
     const ALL_LED_ON_L = 0xFA
     const ALL_LED_ON_H = 0xFB
     const ALL_LED_OFF_L = 0xFC
     const ALL_LED_OFF_H = 0xFD
 
-    const STP_CHA_L = 2047
-    const STP_CHA_H = 4095
-
-    const STP_CHB_L = 1
-    const STP_CHB_H = 2047
-
-    const STP_CHC_L = 1023
-    const STP_CHC_H = 3071
-
-    const STP_CHD_L = 3071
-    const STP_CHD_H = 1023
-
-    // HT16K33 commands
-    const HT16K33_ADDRESS = 0x70
-    const HT16K33_BLINK_CMD = 0x80
-    const HT16K33_BLINK_DISPLAYON = 0x01
-    const HT16K33_BLINK_OFF = 0
-    const HT16K33_BLINK_2HZ = 1
-    const HT16K33_BLINK_1HZ = 2
-    const HT16K33_BLINK_HALFHZ = 3
-    const HT16K33_CMD_BRIGHTNESS = 0xE0
-
-    export enum Servos {
-        S1 = 0x01,
-        S2 = 0x02,
-        S3 = 0x03,
-        S4 = 0x04,
-        S5 = 0x05,
-        S6 = 0x06,
-        S7 = 0x07,
-        S8 = 0x08
-    }
-
-    export enum Motors {
-        M1A = 0x1,
-        M1B = 0x2,
-        M2A = 0x3,
-        M2B = 0x4
-    }
-
-    export enum Steppers {
-        M1 = 0x1,
-        M2 = 0x2
-    }
-
-    export enum Turns {
-        //% blockId="T1B4" block="1/4"
-        T1B4 = 90,
-        //% blockId="T1B2" block="1/2"
-        T1B2 = 180,
-        //% blockId="T1B0" block="1"
-        T1B0 = 360,
-        //% blockId="T2B0" block="2"
-        T2B0 = 720,
-        //% blockId="T3B0" block="3"
-        T3B0 = 1080,
-        //% blockId="T4B0" block="4"
-        T4B0 = 1440,
-        //% blockId="T5B0" block="5"
-        T5B0 = 1800
-    }
+    const PRESCALE = 0xFE
 
     let initialized = false
-    let initializedMatrix = false
-    let neoStrip: neopixel.Strip;
-    let matBuf = pins.createBuffer(17);
-    let distanceBuf = 0;
+    let yahStrip: neopixel.Strip;
+
+    export enum enColor {
+
+        //% blockId="OFF" block="灭"
+        OFF = 0,
+        //% blockId="Red" block="红色"
+        Red,
+        //% blockId="Green" block="绿色"
+        Green,
+        //% blockId="Blue" block="蓝色"
+        Blue,
+        //% blockId="White" block="白色"
+        White,
+        //% blockId="Cyan" block="青色"
+        Cyan,
+        //% blockId="Pinkish" block="品红"
+        Pinkish,
+        //% blockId="Yellow" block="黄色"
+        Yellow,
+
+    }
+    export enum enMusic {
+
+        dadadum = 0,
+        entertainer,
+        prelude,
+        ode,
+        nyan,
+        ringtone,
+        funk,
+        blues,
+
+        birthday,
+        wedding,
+        funereal,
+        punchline,
+        baddy,
+        chase,
+        ba_ding,
+        wawawawaa,
+        jump_up,
+        jump_down,
+        power_up,
+        power_down
+    }
+    export enum enPos {
+
+        //% blockId="LeftState" block="左边状态"
+        LeftState = 0,
+        //% blockId="RightState" block="右边状态"
+        RightState = 1
+    }
+
+    export enum enLineState {
+        //% blockId="White" block="白线"
+        White = 0,
+        //% blockId="Black" block="黑线"
+        Black = 1
+
+    }
+    
+    export enum enAvoidState {
+        //% blockId="OBSTACLE" block="有障碍物"
+        OBSTACLE = 0,
+        //% blockId="NOOBSTACLE" block="无障碍物"
+        NOOBSTACLE = 1
+
+    }
+
+    
+    export enum enServo {
+        
+        S1 = 1,
+        S2,
+        S3
+    }
+    export enum CarState {
+        //% blockId="Car_Run" block="前行"
+        Car_Run = 1,
+        //% blockId="Car_Back" block="后退"
+        Car_Back = 2,
+        //% blockId="Car_Left" block="左转"
+        Car_Left = 3,
+        //% blockId="Car_Right" block="右转"
+        Car_Right = 4,
+        //% blockId="Car_Stop" block="停止"
+        Car_Stop = 5,
+        //% blockId="Car_SpinLeft" block="原地左旋"
+        Car_SpinLeft = 6,
+        //% blockId="Car_SpinRight" block="原地右旋"
+        Car_SpinRight = 7
+    }
 
     function i2cwrite(addr: number, reg: number, value: number) {
         let buf = pins.createBuffer(2)
@@ -112,11 +566,8 @@ namespace robotbit {
     }
 
     function initPCA9685(): void {
-        i2cwrite(PCA9685_ADDRESS, MODE1, 0x00)
+        i2cwrite(PCA9685_ADD, MODE1, 0x00)
         setFreq(50);
-        for (let idx = 0; idx < 16; idx++) {
-            setPwm(idx, 0 ,0);
-        }
         initialized = true
     }
 
@@ -127,358 +578,520 @@ namespace robotbit {
         prescaleval /= freq;
         prescaleval -= 1;
         let prescale = prescaleval; //Math.Floor(prescaleval + 0.5);
-        let oldmode = i2cread(PCA9685_ADDRESS, MODE1);
+        let oldmode = i2cread(PCA9685_ADD, MODE1);
         let newmode = (oldmode & 0x7F) | 0x10; // sleep
-        i2cwrite(PCA9685_ADDRESS, MODE1, newmode); // go to sleep
-        i2cwrite(PCA9685_ADDRESS, PRESCALE, prescale); // set the prescaler
-        i2cwrite(PCA9685_ADDRESS, MODE1, oldmode);
+        i2cwrite(PCA9685_ADD, MODE1, newmode); // go to sleep
+        i2cwrite(PCA9685_ADD, PRESCALE, prescale); // set the prescaler
+        i2cwrite(PCA9685_ADD, MODE1, oldmode);
         control.waitMicros(5000);
-        i2cwrite(PCA9685_ADDRESS, MODE1, oldmode | 0xa1);
+        i2cwrite(PCA9685_ADD, MODE1, oldmode | 0xa1);
     }
 
     function setPwm(channel: number, on: number, off: number): void {
         if (channel < 0 || channel > 15)
             return;
-        //serial.writeValue("ch", channel)
-        //serial.writeValue("on", on)
-        //serial.writeValue("off", off)
-        
+        if (!initialized) {
+            initPCA9685();
+        }
         let buf = pins.createBuffer(5);
         buf[0] = LED0_ON_L + 4 * channel;
         buf[1] = on & 0xff;
         buf[2] = (on >> 8) & 0xff;
         buf[3] = off & 0xff;
         buf[4] = (off >> 8) & 0xff;
-        pins.i2cWriteBuffer(PCA9685_ADDRESS, buf);
+        pins.i2cWriteBuffer(PCA9685_ADD, buf);
     }
 
 
-    function setStepper(index: number, dir: boolean): void {
-        if (index == 1) {
-            if (dir) {
-                setPwm(0, STP_CHA_L, STP_CHA_H);
-                setPwm(2, STP_CHB_L, STP_CHB_H);
-                setPwm(1, STP_CHC_L, STP_CHC_H);
-                setPwm(3, STP_CHD_L, STP_CHD_H);
-            } else {
-                setPwm(3, STP_CHA_L, STP_CHA_H);
-                setPwm(1, STP_CHB_L, STP_CHB_H);
-                setPwm(2, STP_CHC_L, STP_CHC_H);
-                setPwm(0, STP_CHD_L, STP_CHD_H);
-            }
-        } else {
-            if (dir) {
-                setPwm(4, STP_CHA_L, STP_CHA_H);
-                setPwm(6, STP_CHB_L, STP_CHB_H);
-                setPwm(5, STP_CHC_L, STP_CHC_H);
-                setPwm(7, STP_CHD_L, STP_CHD_H);
-            } else {
-                setPwm(7, STP_CHA_L, STP_CHA_H);
-                setPwm(5, STP_CHB_L, STP_CHB_H);
-                setPwm(6, STP_CHC_L, STP_CHC_H);
-                setPwm(4, STP_CHD_L, STP_CHD_H);
-            }
+    function Car_run(speed1: number, speed2: number) {
+
+        speed1 = speed1 * 16; // map 350 to 4096
+        speed2 = speed2 * 16;
+        if (speed1 >= 4096) {
+            speed1 = 4095
         }
+        if (speed1 <= 350) {
+            speed1 = 350
+        }
+        if (speed2 >= 4096) {
+            speed2 = 4095
+        }
+        if (speed2 <= 350) {
+            speed2 = 350
+        }
+
+        setPwm(12, 0, speed1);
+        setPwm(13, 0, 0);
+
+        setPwm(15, 0, speed2);
+        setPwm(14, 0, 0);
+        //pins.digitalWritePin(DigitalPin.P16, 1);
+       // pins.analogWritePin(AnalogPin.P1, 1023-speed); //速度控制
+
+       // pins.analogWritePin(AnalogPin.P0, speed);//速度控制
+       // pins.digitalWritePin(DigitalPin.P8, 0);
     }
 
-    function stopMotor(index: number) {
-        setPwm((index - 1) * 2, 0, 0);
-        setPwm((index - 1) * 2 + 1, 0, 0);
+    function Car_back(speed1: number, speed2: number) {
+
+        speed1 = speed1 * 16; // map 350 to 4096
+        speed2 = speed2 * 16;
+        if (speed1 >= 4096) {
+            speed1 = 4095
+        }
+        if (speed1 <= 350) {
+            speed1 = 350
+        }
+        if (speed2 >= 4096) {
+            speed2 = 4095
+        }
+        if (speed2 <= 350) {
+            speed2 = 350
+        }
+
+        setPwm(12, 0, 0);
+        setPwm(13, 0, speed1);
+
+        setPwm(15, 0, 0);
+        setPwm(14, 0, speed2);
+
+        //pins.digitalWritePin(DigitalPin.P16, 0);
+        //pins.analogWritePin(AnalogPin.P1, speed); //速度控制
+
+        //pins.analogWritePin(AnalogPin.P0, 1023 - speed);//速度控制
+        //pins.digitalWritePin(DigitalPin.P8, 1);
     }
 
-    function matrixInit() {
-        i2ccmd(HT16K33_ADDRESS, 0x21);// turn on oscillator
-        i2ccmd(HT16K33_ADDRESS, HT16K33_BLINK_CMD | HT16K33_BLINK_DISPLAYON | (0 << 1));
-        i2ccmd(HT16K33_ADDRESS, HT16K33_CMD_BRIGHTNESS | 0xF);
+    function Car_left(speed1: number, speed2: number) {
+
+        speed1 = speed1 * 16; // map 350 to 4096
+        speed2 = speed2 * 16;
+        if (speed1 >= 4096) {
+            speed1 = 4095
+        }
+        if (speed1 <= 350) {
+            speed1 = 350
+        }
+        if (speed2 >= 4096) {
+            speed2 = 4095
+        }
+        if (speed2 <= 350) {
+            speed2 = 350
+        }
+        
+        setPwm(12, 0, speed1);
+        setPwm(13, 0, 0);
+
+        setPwm(15, 0, speed2);
+        setPwm(14, 0, 0);
+
+        //pins.analogWritePin(AnalogPin.P0, speed);
+        //pins.digitalWritePin(DigitalPin.P8, 0);
+
+        //pins.digitalWritePin(DigitalPin.P16, 0);
+        //pins.digitalWritePin(DigitalPin.P1, 0);
     }
 
-    function matrixShow() {
-        matBuf[0] = 0x00;
-        pins.i2cWriteBuffer(HT16K33_ADDRESS, matBuf);
+    function Car_right(speed1: number, speed2: number) {
+
+        speed1 = speed1 * 16; // map 350 to 4096
+        speed2 = speed2 * 16;
+        if (speed1 >= 4096) {
+            speed1 = 4095
+        }
+        if (speed1 <= 350) {
+            speed1 = 350
+        }
+        if (speed2 >= 4096) {
+            speed2 = 4095
+        }
+        if (speed2 <= 350) {
+            speed2 = 350
+        }
+        
+        setPwm(12, 0, speed1);
+        setPwm(13, 0, 0);
+
+        setPwm(15, 0, speed2);
+        setPwm(14, 0, 0);
+        //pins.digitalWritePin(DigitalPin.P0, 0);
+        //pins.digitalWritePin(DigitalPin.P8, 0);
+
+        //pins.digitalWritePin(DigitalPin.P16, 1);
+       // pins.analogWritePin(AnalogPin.P1, 1023 - speed);
     }
 
+    function Car_stop() {
+       
+        setPwm(12, 0, 0);
+        setPwm(13, 0, 0);
+
+        setPwm(15, 0, 0);
+        setPwm(14, 0, 0);
+        //pins.digitalWritePin(DigitalPin.P0, 0);
+        //pins.digitalWritePin(DigitalPin.P8, 0);
+        //pins.digitalWritePin(DigitalPin.P16, 0);
+        //pins.digitalWritePin(DigitalPin.P1, 0);
+    }
+
+    function Car_spinleft(speed1: number, speed2: number) {
+
+        speed1 = speed1 * 16; // map 350 to 4096
+        speed2 = speed2 * 16;
+        if (speed1 >= 4096) {
+            speed1 = 4095
+        }
+        if (speed1 <= 350) {
+            speed1 = 350
+        }
+        if (speed2 >= 4096) {
+            speed2 = 4095
+        }
+        if (speed2 <= 350) {
+            speed2 = 350
+        }        
+        
+        setPwm(12, 0, 0);
+        setPwm(13, 0, speed1);
+
+        setPwm(15, 0, speed2);
+        setPwm(14, 0, 0);
+
+        //pins.analogWritePin(AnalogPin.P0, speed);
+        //pins.digitalWritePin(DigitalPin.P8, 0);
+
+        //pins.digitalWritePin(DigitalPin.P16, 0);
+        //pins.analogWritePin(AnalogPin.P1, speed);
+    } 
+
+    function Car_spinright(speed1: number, speed2: number) {
+
+        speed1 = speed1 * 16; // map 350 to 4096
+        speed2 = speed2 * 16;
+        if (speed1 >= 4096) {
+            speed1 = 4095
+        }
+        if (speed1 <= 350) {
+            speed1 = 350
+        }
+        if (speed2 >= 4096) {
+            speed2 = 4095
+        }
+        if (speed2 <= 350) {
+            speed2 = 350
+        }    
+            
+        setPwm(12, 0, speed1);
+        setPwm(13, 0, 0);
+
+        setPwm(15, 0, 0);
+        setPwm(14, 0, speed2);
+        //pins.analogWritePin(AnalogPin.P0, 1023-speed);
+        //pins.digitalWritePin(DigitalPin.P8, 1);
+
+        //pins.digitalWritePin(DigitalPin.P16, 1);
+        //pins.analogWritePin(AnalogPin.P1, 1023-speed);
+
+    }
 
     /**
-     * Init RGB pixels mounted on robotbit
+     * *****************************************************************
+     * @param index
      */
-    //% blockId="robotbit_rgb" block="RGB"
-    //% weight=5
-    export function rgb(): neopixel.Strip {
-        if (!neoStrip) {
-            neoStrip = neopixel.create(DigitalPin.P16, 4, NeoPixelMode.RGB)
+    //% blockId=mbit_RGB_Car_Big2 block="RGB_Car_Big2|value %value"
+    //% weight=101
+    //% blockGap=10
+    //% color="#C814B8"
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    export function RGB_Car_Big2(value: enColor): void {
+
+        switch (value) {
+            case enColor.OFF: {
+                setPwm(0, 0, 0);
+                setPwm(1, 0, 0);
+                setPwm(2, 0, 0);
+                break;
+            }
+            case enColor.Red: {
+                setPwm(0, 0, 4095);
+                setPwm(1, 0, 0);
+                setPwm(2, 0, 0);
+                break;
+            }
+            case enColor.Green: {
+                setPwm(0, 0, 0);
+                setPwm(1, 0, 4095);
+                setPwm(2, 0, 0);
+                break;
+            }
+            case enColor.Blue: {
+                setPwm(0, 0, 0);
+                setPwm(1, 0, 0);
+                setPwm(2, 0, 4095);
+                break;
+            }
+            case enColor.White: {
+                setPwm(0, 0, 4095);
+                setPwm(1, 0, 4095);
+                setPwm(2, 0, 4095);
+                break;
+            }
+            case enColor.Cyan: {
+                setPwm(0, 0, 0);
+                setPwm(1, 0, 4095);
+                setPwm(2, 0, 4095);
+                break;
+            }
+            case enColor.Pinkish: {
+                setPwm(0, 0, 4095);
+                setPwm(1, 0, 0);
+                setPwm(2, 0, 4095);
+                break;
+            }
+            case enColor.Yellow: {
+                setPwm(0, 0, 4095);
+                setPwm(1, 0, 4095);
+                setPwm(2, 0, 0);
+                break;
+            }
         }
-
-        return neoStrip;
     }
-
-    /**
-     * Servo Execute
-     * @param index Servo Channel; eg: S1
-     * @param degree [0-180] degree of servo; eg: 0, 90, 180
-    */
-    //% blockId=robotbit_servo block="Servo|%index|degree %degree"
+    //% blockId=mbit_RGB_Car_Big block="RGB_Car_Big|value1 %value1|value2 %value2|value3 %value3"
     //% weight=100
-    //% degree.min=0 degree.max=180
+    //% blockGap=10
+    //% color="#C814B8"
+    //% value1.min=0 value1.max=255 value2.min=0 value2.max=255 value3.min=0 value3.max=255
     //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
-    export function Servo(index: Servos, degree: number): void {
-        if (!initialized) {
-            initPCA9685()
-        }
-        // 50hz: 20,000 us
-        let v_us = (degree * 1800 / 180 + 600) // 0.6 ~ 2.4
-        let value = v_us * 4096 / 20000
-        setPwm(index + 7, 0, value)
+    export function RGB_Car_Big(value1: number, value2: number, value3: number): void {
+
+        let R = value1 * 16;
+        let G = value2 * 16;
+        let B = value3 * 16;
+
+        if (R > 4096)
+            R = 4095;
+        if (G > 4096)
+            G = 4095;
+        if (B > 4096)
+            B = 4095;
+
+        setPwm(0, 0, R);
+        setPwm(1, 0, G);
+        setPwm(2, 0, B);
+
     }
 
-    /**
-     * Geek Servo
-     * @param index Servo Channel; eg: S1
-     * @param degree [-45-225] degree of servo; eg: -45, 90, 225
-    */
-    //% blockId=robotbit_gservo block="Geek Servo|%index|degree %degree"
+    //% blockId=mbit_RGB_Car_Program block="RGB_Car_Program"
     //% weight=99
-    //% blockGap=50
-    //% degree.min=-45 degree.max=225
+    //% blockGap=10
+    //% color="#C814B8"
     //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
-    export function GeekServo(index: Servos, degree: number): void {
-        if (!initialized) {
-            initPCA9685()
+    export function RGB_Car_Program(): neopixel.Strip {
+         
+        if (!yahStrip) {
+            yahStrip = neopixel.create(DigitalPin.P16, 3, NeoPixelMode.RGB);
         }
-        // 50hz: 20,000 us
-        let v_us = ((degree -90) * 20 / 3 + 1500) // 0.6 ~ 2.4
-        let value = v_us * 4096 / 20000
-        setPwm(index + 7, 0, value)
-    }
-    
-    //% blockId=robotbit_stepper_degree block="Stepper 28BYJ-48|%index|degree %degree"
-    //% weight=90
-    export function StepperDegree(index: Steppers, degree: number): void {
-        if (!initialized) {
-            initPCA9685()
-        }
-        setStepper(index, degree > 0);
-        degree = Math.abs(degree);
-        basic.pause(10240 * degree / 360);
-        MotorStopAll()
+        return yahStrip;  
     }
 
 
-    //% blockId=robotbit_stepper_turn block="Stepper 28BYJ-48|%index|turn %turn"
-    //% weight=90
-    export function StepperTurn(index: Steppers, turn: Turns): void {
-        let degree = turn;
-        StepperDegree(index, degree);
-    }
-
-    //% blockId=robotbit_stepper_dual block="Dual Stepper(Degree) |M1 %degree1| M2 %degree2"
-    //% weight=89
-    export function StepperDual(degree1: number, degree2: number): void {
-        if (!initialized) {
-            initPCA9685()
-        }
-        setStepper(1, degree1 > 0);
-        setStepper(2, degree2 > 0);
-        degree1 = Math.abs(degree1);
-        degree2 = Math.abs(degree2);
-        basic.pause(10240 * Math.min(degree1, degree2) / 360);
-        if (degree1 > degree2) {
-            stopMotor(3); stopMotor(4);
-            basic.pause(10240 * (degree1 - degree2) / 360);
-        } else {
-            stopMotor(1); stopMotor(2);
-            basic.pause(10240 * (degree2 - degree1) / 360);
-        }
-
-        MotorStopAll()
-    }
-
-    /**
-     * Stepper Car move forward
-     * @param distance Distance to move in cm; eg: 10, 20
-     * @param diameter diameter of wheel in mm; eg: 48
-    */
-    //% blockId=robotbit_stpcar_move block="Car Forward|Distance(cm) %distance|Wheel Diameter(mm) %diameter"
-    //% weight=88
-    export function StpCarMove(distance: number, diameter: number): void {
-        if (!initialized) {
-            initPCA9685()
-        }
-        let delay = 10240 * 10 * distance / 3 / diameter; // use 3 instead of pi
-        setStepper(1, delay > 0);
-        setStepper(2, delay > 0);
-        delay = Math.abs(delay);
-        basic.pause(delay);
-        MotorStopAll()	
-    }
-
-    /**
-     * Stepper Car turn by degree
-     * @param turn Degree to turn; eg: 90, 180, 360
-     * @param diameter diameter of wheel in mm; eg: 48
-     * @param track track width of car; eg: 125
-    */
-    //% blockId=robotbit_stpcar_turn block="Car Turn|Degree %turn|Wheel Diameter(mm) %diameter|Track(mm) %track"
-    //% weight=87
-    //% blockGap=50
-    export function StpCarTurn(turn: number, diameter: number, track: number): void {
-        if (!initialized) {
-            initPCA9685()
-        }
-        let delay = 10240 * turn * track / 360 / diameter;
-        setStepper(1, delay < 0);
-        setStepper(2, delay > 0);
-        delay = Math.abs(delay);
-        basic.pause(delay);
-        MotorStopAll()
-    }
-
-    //% blockId=robotbit_motor_run block="Motor|%index|speed %speed"
-    //% weight=85
-    //% speed.min=-255 speed.max=255
+	//% blockId=mbit_ultrasonic_car block="ultrasonic return distance(cm)"
+    //% color="#006400"
+    //% weight=98
+    //% blockGap=10
     //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
-    export function MotorRun(index: Motors, speed: number): void {
-        if (!initialized) {
-            initPCA9685()
-        }
-        speed = speed * 16; // map 255 to 4096
-        if (speed >= 4096) {
-            speed = 4095
-        }
-        if (speed <= -4096) {
-            speed = -4095
-        }
-        if (index > 4 || index <= 0)
-            return
-        let pp = (index - 1) * 2
-        let pn = (index - 1) * 2 + 1
-        if (speed >= 0) {
-            setPwm(pp, 0, speed)
-            setPwm(pn, 0, 0)
-        } else {
-            setPwm(pp, 0, 0)
-            setPwm(pn, 0, -speed)
-        }
-    }
-
-
-    /**
-     * Execute two motors at the same time
-     * @param motor1 First Motor; eg: M1A, M1B
-     * @param speed1 [-255-255] speed of motor; eg: 150, -150
-     * @param motor2 Second Motor; eg: M2A, M2B
-     * @param speed2 [-255-255] speed of motor; eg: 150, -150
-    */
-    //% blockId=robotbit_motor_dual block="Motor|%motor1|speed %speed1|%motor2|speed %speed2"
-    //% weight=84
-    //% speed1.min=-255 speed1.max=255
-    //% speed2.min=-255 speed2.max=255
-    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
-    export function MotorRunDual(motor1: Motors, speed1: number, motor2: Motors, speed2: number): void {
-        MotorRun(motor1, speed1);
-        MotorRun(motor2, speed2);
-    }
-
-    /**
-     * Execute single motors with delay
-     * @param index Motor Index; eg: M1A, M1B, M2A, M2B
-     * @param speed [-255-255] speed of motor; eg: 150, -150
-     * @param delay seconde delay to stop; eg: 1
-    */
-    //% blockId=robotbit_motor_rundelay block="Motor|%index|speed %speed|delay %delay|s"
-    //% weight=81
-    //% speed.min=-255 speed.max=255
-    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
-    export function MotorRunDelay(index: Motors, speed: number, delay: number): void {
-        MotorRun(index, speed);
-        basic.pause(delay * 1000);
-        MotorRun(index, 0);
-    }
-
-
-
-    //% blockId=robotbit_stop block="Motor Stop|%index|"
-    //% weight=80
-    export function MotorStop(index: Motors): void {
-        MotorRun(index, 0);
-    }
-
-    //% blockId=robotbit_stop_all block="Motor Stop All"
-    //% weight=79
-    //% blockGap=50
-    export function MotorStopAll(): void {
-        if (!initialized) {
-            initPCA9685()
-        }
-        for (let idx = 1; idx <= 4; idx++) {
-            stopMotor(idx);
-        }
-    }
-
-    //% blockId=robotbit_matrix_draw block="Matrix Draw|X %x|Y %y"
-    //% weight=69
-    export function MatrixDraw(x: number, y: number): void {
-        if (!initializedMatrix) {
-            matrixInit();
-            initializedMatrix = true;
-        }
-        let idx = y * 2 + x / 8;
-        let tmp = matBuf[idx + 1];
-        tmp |= (1 << (x % 8));
-        matBuf[idx + 1] = tmp;
-        matrixShow();
-    }
-
-	/*
-    //% blockId=robotbit_matrix_clean block="Matrix Clean|X %x|Y %y"
-    //% weight=68
-    export function MatrixClean(x: number, y: number): void {
-        if (!initializedMatrix) {
-            matrixInit();
-            initializedMatrix = true;
-        }
-        let idx = y * 2 + x / 8;
-		// todo: bitwise not throw err 
-        matBuf[idx + 1] &=~(1 << (x % 8));
-        matrixShow();
-    }
-	*/
-
-    //% blockId=robotbit_matrix_clear block="Matrix Clear"
-    //% weight=65
-    //% blockGap=50
-    export function MatrixClear(): void {
-        if (!initializedMatrix) {
-            matrixInit();
-            initializedMatrix = true;
-        }
-        for (let i = 0; i < 16; i++) {
-            matBuf[i + 1] = 0;
-        }
-        matrixShow();
-    }
-
-    //% blockId=robotbit_ultrasonic block="Ultrasonic|pin %pin"
-    //% weight=10
-    export function Ultrasonic(pin: DigitalPin): number {
+    export function Ultrasonic_Car(): number {
 
         // send pulse
-        pins.setPull(pin, PinPullMode.PullNone);
-        pins.digitalWritePin(pin, 0);
+        pins.setPull(DigitalPin.P14, PinPullMode.PullNone);
+        pins.digitalWritePin(DigitalPin.P14, 0);
         control.waitMicros(2);
-        pins.digitalWritePin(pin, 1);
-        control.waitMicros(10);
-        pins.digitalWritePin(pin, 0);
+        pins.digitalWritePin(DigitalPin.P14, 1);
+        control.waitMicros(15);
+        pins.digitalWritePin(DigitalPin.P14, 0);
 
         // read pulse
-        let d = pins.pulseIn(pin, PulseValue.High, 25000);
-        let ret = d;
-        // filter timeout spikes
-        if (ret == 0 && distanceBuf!= 0){
-            ret = distanceBuf;
-        }
-        distanceBuf = d;
-        return Math.floor(ret*10/6/58);
+        let d = pins.pulseIn(DigitalPin.P15, PulseValue.High, 43200);
+        return d / 58;
     }
 
+    //% blockId=mbit_Music_Car block="Music_Car|%index"
+    //% weight=97
+    //% blockGap=10
+    //% color="#006400"
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    export function Music_Car(index: enMusic): void {
+        switch (index) {
+            case enMusic.dadadum: music.beginMelody(music.builtInMelody(Melodies.Dadadadum), MelodyOptions.Once); break;
+            case enMusic.birthday: music.beginMelody(music.builtInMelody(Melodies.Birthday), MelodyOptions.Once); break;
+            case enMusic.entertainer: music.beginMelody(music.builtInMelody(Melodies.Entertainer), MelodyOptions.Once); break;
+            case enMusic.prelude: music.beginMelody(music.builtInMelody(Melodies.Prelude), MelodyOptions.Once); break;
+            case enMusic.ode: music.beginMelody(music.builtInMelody(Melodies.Ode), MelodyOptions.Once); break;
+            case enMusic.nyan: music.beginMelody(music.builtInMelody(Melodies.Nyan), MelodyOptions.Once); break;
+            case enMusic.ringtone: music.beginMelody(music.builtInMelody(Melodies.Ringtone), MelodyOptions.Once); break;
+            case enMusic.funk: music.beginMelody(music.builtInMelody(Melodies.Funk), MelodyOptions.Once); break;
+            case enMusic.blues: music.beginMelody(music.builtInMelody(Melodies.Blues), MelodyOptions.Once); break;
+            case enMusic.wedding: music.beginMelody(music.builtInMelody(Melodies.Wedding), MelodyOptions.Once); break;
+            case enMusic.funereal: music.beginMelody(music.builtInMelody(Melodies.Funeral), MelodyOptions.Once); break;
+            case enMusic.punchline: music.beginMelody(music.builtInMelody(Melodies.Punchline), MelodyOptions.Once); break;
+            case enMusic.baddy: music.beginMelody(music.builtInMelody(Melodies.Baddy), MelodyOptions.Once); break;
+            case enMusic.chase: music.beginMelody(music.builtInMelody(Melodies.Chase), MelodyOptions.Once); break;
+            case enMusic.ba_ding: music.beginMelody(music.builtInMelody(Melodies.BaDing), MelodyOptions.Once); break;
+            case enMusic.wawawawaa: music.beginMelody(music.builtInMelody(Melodies.Wawawawaa), MelodyOptions.Once); break;
+            case enMusic.jump_up: music.beginMelody(music.builtInMelody(Melodies.JumpUp), MelodyOptions.Once); break;
+            case enMusic.jump_down: music.beginMelody(music.builtInMelody(Melodies.JumpDown), MelodyOptions.Once); break;
+            case enMusic.power_up: music.beginMelody(music.builtInMelody(Melodies.PowerUp), MelodyOptions.Once); break;
+            case enMusic.power_down: music.beginMelody(music.builtInMelody(Melodies.PowerDown), MelodyOptions.Once); break;
+        }
+    }
+    //% blockId=mbit_Servo_Car block="Servo_Car|num %num|value %value"
+    //% weight=96
+    //% blockGap=10
+    //% color="#006400"
+    //% num.min=1 num.max=3 value.min=0 value.max=180
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=9
+    export function Servo_Car(num: enServo, value: number): void {
 
+        // 50hz: 20,000 us
+        let us = (value * 1800 / 180 + 600); // 0.6 ~ 2.4
+        let pwm = us * 4096 / 20000;
+        setPwm(num + 2, 0, pwm);
+
+    }
+
+    //% blockId=mbit_Avoid_Sensor block="Avoid_Sensor|value %value"
+    //% weight=95
+    //% blockGap=10
+    //% color="#006400"
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=12
+    export function Avoid_Sensor(value: enAvoidState): boolean {
+
+        let temp: boolean = false;
+        pins.digitalWritePin(DigitalPin.P9, 0);
+        switch (value) {
+            case enAvoidState.OBSTACLE: {
+                if (pins.analogReadPin(AnalogPin.P3) < 800) {
+                
+                    temp = true;
+                    setPwm(8, 0, 0);
+                }
+                else {                 
+                    temp = false;
+                    setPwm(8, 0, 4095);
+                }
+                break;
+            }
+
+            case enAvoidState.NOOBSTACLE: {
+                if (pins.analogReadPin(AnalogPin.P3) > 800) {
+
+                    temp = true;
+                    setPwm(8, 0, 4095);
+                }
+                else {
+                    temp = false;
+                    setPwm(8, 0, 0);
+                }
+                break;
+            }
+        }
+        pins.digitalWritePin(DigitalPin.P9, 1);
+        return temp;
+
+    }
+    //% blockId=mbit_Line_Sensor block="Line_Sensor|direct %direct|value %value"
+    //% weight=94
+    //% blockGap=10
+    //% color="#006400"
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=12
+    export function Line_Sensor(direct: enPos, value: enLineState): boolean {
+
+        let temp: boolean = false;
+
+        switch (direct) {
+            case enPos.LeftState: {
+                if (pins.analogReadPin(AnalogPin.P2) < 500) {
+                    if (value == enLineState.White) {
+                        temp = true;
+                    }
+                    setPwm(7, 0, 4095);
+                }
+                else {
+                    if (value == enLineState.Black) {
+                        temp = true;
+                    }
+                    setPwm(7, 0, 0);
+                }
+                break;
+            }
+
+            case enPos.RightState: {
+                if (pins.analogReadPin(AnalogPin.P1) < 500) {
+                    if (value == enLineState.White) {
+                        temp = true;
+                    }
+                    setPwm(6, 0, 4095);
+                }
+                else {
+                    if (value == enLineState.Black) {
+                        temp = true;
+                    }
+                    setPwm(6, 0, 0);
+                }
+                break;
+            }
+        }
+        return temp;
+
+    }
+    //% blockId=mbit_CarCtrl block="CarCtrl|%index"
+    //% weight=93
+    //% blockGap=10
+    //% color="#006400"
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=10
+    export function CarCtrl(index: CarState): void {
+        switch (index) {
+            case CarState.Car_Run: Car_run(255, 255); break;
+            case CarState.Car_Back: Car_back(255, 255); break;
+            case CarState.Car_Left: Car_left(255, 255); break;
+            case CarState.Car_Right: Car_right(255, 255); break;
+            case CarState.Car_Stop: Car_stop(); break;
+            case CarState.Car_SpinLeft: Car_spinleft(255, 255); break;
+            case CarState.Car_SpinRight: Car_spinright(255, 255); break;
+        }
+    }
+    //% blockId=mbit_CarCtrlSpeed block="CarCtrlSpeed|%index|speed %speed"
+    //% weight=92
+    //% blockGap=10
+    //% speed.min=0 speed.max=255
+    //% color="#006400"
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=10
+    export function CarCtrlSpeed(index: CarState, speed: number): void {
+        switch (index) {
+            case CarState.Car_Run: Car_run(speed, speed); break;
+            case CarState.Car_Back: Car_back(speed, speed); break;
+            case CarState.Car_Left: Car_left(speed, speed); break;
+            case CarState.Car_Right: Car_right(speed, speed); break;
+            case CarState.Car_Stop: Car_stop(); break;
+            case CarState.Car_SpinLeft: Car_spinleft(speed, speed); break;
+            case CarState.Car_SpinRight: Car_spinright(speed, speed); break;
+        }
+    }
+    //% blockId=mbit_CarCtrlSpeed2 block="CarCtrlSpeed2|%index|speed1 %speed1|speed2 %speed2"
+    //% weight=91
+    //% blockGap=10
+    //% speed1.min=0 speed1.max=255 speed2.min=0 speed2.max=255
+    //% color="#006400"
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=10
+    export function CarCtrlSpeed2(index: CarState, speed1: number, speed2: number): void {
+        switch (index) {
+            case CarState.Car_Run: Car_run(speed1, speed2); break;
+            case CarState.Car_Back: Car_back(speed1, speed2); break;
+            case CarState.Car_Left: Car_left(speed1, speed2); break;
+            case CarState.Car_Right: Car_right(speed1, speed2); break;
+            case CarState.Car_Stop: Car_stop(); break;
+            case CarState.Car_SpinLeft: Car_spinleft(speed1, speed2); break;
+            case CarState.Car_SpinRight: Car_spinright(speed1, speed2); break;
+        }
+    }
 }
